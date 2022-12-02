@@ -57,3 +57,43 @@
 ;(setf *file* (load-file "./test_input_day2.txt")) ;; procedure
 
 (format t "Day2 Part1 answer: ~d~%" (total-of-rounds-part1 (file-to-moves *file*))) ;;procedure
+
+
+;; Part 2
+
+
+;; A - Rock, B- Paper, C-Scissors
+;; X-Lose , Y - draw , Z - win
+(defun score-round-part2 (round)
+  (let (;(score 0)
+        (loss-pt 0)
+        (draw-pt 3)
+        (win-pt 6)
+        (rock-pt 1)
+        (paper-pt 2)
+        (scissors-pt 3))
+    (cond
+      ((equal "A" (car round))
+        (cond
+              ((equal "X" (cadr round)) (+ scissors-pt loss-pt))
+              ((equal "Y" (cadr round)) (+ rock-pt draw-pt))
+              ((equal "Z" (cadr round)) (+ paper-pt win-pt))))
+      ((equal"B" (car round))
+       (cond
+              ((equal "X" (cadr round)) (+ rock-pt loss-pt))
+              ((equal "Y" (cadr round)) (+ paper-pt draw-pt))
+              ((equal "Z" (cadr round)) (+ scissors-pt win-pt))))
+      ((equal "C" (car round))
+       (cond
+              ((equal "X" (cadr round)) (+ paper-pt loss-pt))
+              ((equal "Y" (cadr round)) (+ scissors-pt draw-pt))
+              ((equal "Z" (cadr round)) (+ rock-pt win-pt)))))))
+
+
+(defun total-of-rounds-part2 (round-list)
+  (let ((grand-total 0))
+    (dolist (round round-list)
+      (setq grand-total (+ grand-total (score-round-part2 round))))
+    grand-total))
+
+(format t "Day2 Part2 answer: ~d~%" (total-of-rounds-part2 (file-to-moves *file*))) ;;procedure
