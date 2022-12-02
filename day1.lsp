@@ -1,6 +1,5 @@
 ; Day 1, AoC 2022
 
-(defvar *file* nil)
 
 (defun load-file (filename)
   (with-open-file (in filename)
@@ -8,10 +7,6 @@
           while line
           collect line)))
 
-(setf *file* (load-file "./test_input_day1.txt"))
-
-(setq elves nil)
-(setq foods nil)
 
 (defun append-elves (foods)
   (setq elves (append elves (list foods)))
@@ -24,8 +19,31 @@
         (append-elves foods))
     (if (equal food "")
         (setq foods nil)
-        (setq foods (append foods (list (parse-integer food)))))))
+        (setq foods (append foods (list (parse-integer food))))))
+  (append-elves foods)
+  )
 
-(defun count-calories (elf-calories)
+
+(defun max-calories (elf-calories)
+  (let ((highest-cal 0))
     (dolist (elf elf-calories)
-      (format t "~d~%" (reduce #'+ elf))))
+      (if (> (reduce #'+ elf) highest-cal)
+          ;; (format t "New Max~%")
+          ;; (format t "Stays the same~%"))
+          (setq highest-cal (reduce #'+ elf)))
+      ;;(format t "Current calories: ~d~%" (reduce #'+ elf))
+      )
+    ;;(format t "Highest Calories are: ~d~%" highest-cal)
+    highest-cal))
+
+
+(defvar *file* nil) ;;procedure
+
+(setf *file* (load-file "day1_input.txt ")) ;; procedure
+
+(setq elves nil) ;; procedure
+(setq foods nil) ;; procedure
+
+(split-elves *file*) ;; procedure
+
+(format t "Part 1 answer: ~d~%"(max-calories elves)) ;;procedure
