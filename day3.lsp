@@ -1,19 +1,4 @@
 ;; Day 3
-;; read items
-;; split in half
-;; split string into array possibly
-;; sort alphabetically
-;;  (sort '("B" "A") #'string-lessp)
-;;instead of sorting alphabetically, 
-;;        make them both sets
-;; e.g. (adjoin 1 *myset*)
-;;        then do an intersection to find the common 
-;; intersection list1 list2 &key :test :test-not :key
-;; (intersection '(a b c) '(c d e))
-;;
-;;
-;; to score, get value of char and subtract the baseline
-;;  (aref (string-to-octets "Z") 0)
 
 (defun load-file (filename)
   (with-open-file (in filename)
@@ -63,3 +48,44 @@
     running-count))
 
 (format t "Day3 part1 Answer: ~d~%" (collect-scores (split-rucksack *file*)))
+
+;; Part 2
+
+;(defvar *file* nil) ;;procedure
+
+;(setf *file* (load-file "day3_input.txt")) ;; procedure
+;(setf *file* (load-file "./test_input_day3.txt")) ;; procedure
+
+(defun collect-groups (file-list)
+  (let ((group-list))
+    (dotimes (x (/ (length file-list) 3))
+      (setq group-list (cons ( list
+                                (string-to-octets (nth (* x 3) file-list))
+                                (string-to-octets (nth (+ (* x 3) 1) file-list))
+                                (string-to-octets (nth (+ (* x 3) 2) file-list))
+                                )
+                              group-list)))
+    group-list))
+
+(defun find-common-badge (badge-groups)
+  (let ((left)
+        (right)
+        (center))
+      (dotimes (item (length (car badge-groups)))
+        (setq left (adjoin (aref (car badge-groups) item) left)))
+      (dotimes (item (length (cadr badge-groups)))
+        (setq center ( adjoin (aref (cadr badge-groups) item) center)))
+      (dotimes (item (length (caddr badge-groups)))
+        (setq right ( adjoin (aref (caddr badge-groups) item) right)))
+    (car (intersection (intersection left right) center))))
+
+(defun collect-badge-scores (badge-group-list)
+  (let ((running-count 0))
+    (dolist (badge-group badge-group-list)
+      (setq running-count
+            (+ running-count
+               (calculate-score
+                (find-common-badge badge-group)))))
+    running-count))
+
+(format t "Day3 part2 Answer: ~d~%" (collect-badge-scores (collect-groups *file*)))
