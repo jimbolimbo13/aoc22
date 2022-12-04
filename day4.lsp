@@ -11,7 +11,6 @@
 (setf *file* (load-file "day4_input.txt")) ;; procedure
 ;(setf *file* (load-file "./test_input_day4.txt")) ;; procedure
 
-
 (defun split-line (full-line)
   (let* (
          (midpoint (position #\, full-line))
@@ -43,3 +42,34 @@
     running-count))
 
 (format t "Day4, Part 1 answer: ~d~%" (count-overlaps *file*)) ;;procedure
+
+;; Part 2
+
+(defun find-overlap-partial (assignments)
+  (or
+        (or
+            (and
+            (>= (caar assignments) (caadr assignments))
+            (<= (caar assignments) (cadadr assignments)))
+            (and
+            (>= (cadar assignments) (caadr assignments))
+            (<= (cadar assignments) (cadadr assignments)))
+        )
+        (or
+         (and
+            (>= (caadr assignments) (caar assignments))
+            (<= (caadr assignments) (cadar assignments)))
+         (and
+            (>= (cadadr assignments) (caar assignments))
+            (<= (cadadr assignments) (cadar assignments)))
+        )
+  ))
+
+(defun count-overlaps-partial (assignment-list)
+  (let ((running-count 0))
+    (dolist (assignment-pair assignment-list)
+      (if (find-overlap-partial (split-line assignment-pair))
+          (setq running-count (+ running-count 1))))
+    running-count))
+
+(format t "Day4, Part 2 answer: ~d~%" (count-overlaps-partial *file*)) ;;procedure
