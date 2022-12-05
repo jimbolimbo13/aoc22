@@ -34,14 +34,14 @@
         (>= (caadr assignments) (caar assignments))
         (<= (cadadr assignments) (cadar assignments)))))
 
-(defun count-overlaps (assignment-list)
+(defun count-overlaps (assignment-list find-fn)
   (let ((running-count 0))
     (dolist (assignment-pair assignment-list)
-      (if (find-overlap (split-line assignment-pair))
+      (if (funcall find-fn (split-line assignment-pair))
           (setq running-count (+ running-count 1))))
     running-count))
 
-(format t "Day4, Part 1 answer: ~d~%" (count-overlaps *file*)) ;;procedure
+(format t "Day4, Part 1 answer: ~d~%" (count-overlaps *file* 'find-overlap)) ;;procedure
 
 ;; Part 2
 
@@ -65,11 +65,4 @@
         )
   ))
 
-(defun count-overlaps-partial (assignment-list)
-  (let ((running-count 0))
-    (dolist (assignment-pair assignment-list)
-      (if (find-overlap-partial (split-line assignment-pair))
-          (setq running-count (+ running-count 1))))
-    running-count))
-
-(format t "Day4, Part 2 answer: ~d~%" (count-overlaps-partial *file*)) ;;procedure
+(format t "Day4, Part 2 answer: ~d~%" (count-overlaps *file* 'find-overlap-partial)) ;;procedure

@@ -45,10 +45,10 @@
       (setq moves-list (append moves-list (list (split-line line)))))
     moves-list))
 
-(defun total-of-rounds-part1 (round-list)
+(defun total-of-rounds (round-list score-fn)
   (let ((grand-total 0))
     (dolist (round round-list)
-      (setq grand-total (+ grand-total (score-round-part1 round))))
+      (setq grand-total (+ grand-total (funcall score-fn round))))
     grand-total))
 
 (defvar *file* nil) ;;procedure
@@ -56,7 +56,7 @@
 (setf *file* (load-file "day2_input.txt")) ;; procedure
 ;(setf *file* (load-file "./test_input_day2.txt")) ;; procedure
 
-(format t "Day2 Part1 answer: ~d~%" (total-of-rounds-part1 (file-to-moves *file*))) ;;procedure
+(format t "Day2 Part1 answer: ~d~%" (total-of-rounds (file-to-moves *file*) 'score-round-part1)) ;;procedure
 
 
 ;; Part 2
@@ -89,11 +89,4 @@
               ((equal "Y" (cadr round)) (+ scissors-pt draw-pt))
               ((equal "Z" (cadr round)) (+ rock-pt win-pt)))))))
 
-
-(defun total-of-rounds-part2 (round-list)
-  (let ((grand-total 0))
-    (dolist (round round-list)
-      (setq grand-total (+ grand-total (score-round-part2 round))))
-    grand-total))
-
-(format t "Day2 Part2 answer: ~d~%" (total-of-rounds-part2 (file-to-moves *file*))) ;;procedure
+(format t "Day2 Part2 answer: ~d~%" (total-of-rounds (file-to-moves *file*) 'score-round-part2)) ;;procedure

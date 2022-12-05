@@ -38,16 +38,16 @@
             (- rucksack-item 38)))
     score))
 
-(defun collect-scores (rucksack-list)
+(defun collect-scores (rucksack-list find-fn)
   (let ((running-count 0))
     (dolist (rucksack rucksack-list)
       (setq running-count
             (+ running-count
                (calculate-score
-                (find-common rucksack)))))
+                (funcall find-fn rucksack)))))
     running-count))
 
-(format t "Day3 part1 Answer: ~d~%" (collect-scores (split-rucksack *file*)))
+(format t "Day3 part1 Answer: ~d~%" (collect-scores (split-rucksack *file*) 'find-common))
 
 ;; Part 2
 
@@ -79,13 +79,4 @@
         (setq right ( adjoin (aref (caddr badge-groups) item) right)))
     (car (intersection (intersection left right) center))))
 
-(defun collect-badge-scores (badge-group-list)
-  (let ((running-count 0))
-    (dolist (badge-group badge-group-list)
-      (setq running-count
-            (+ running-count
-               (calculate-score
-                (find-common-badge badge-group)))))
-    running-count))
-
-(format t "Day3 part2 Answer: ~d~%" (collect-badge-scores (collect-groups *file*)))
+(format t "Day3 part2 Answer: ~d~%" (collect-scores (collect-groups *file*) 'find-common-badge))
