@@ -46,6 +46,41 @@
     (setf out-line (cl-ppcre:split :whitespace-char-class move-line :omit-unmatched-p nil))
     (mapcar 'parse-integer (list (nth 1 out-line) (nth 3 out-line) (nth 5 out-line)))))
 
+(defun print-stacks (container-stacks)
+  ; get longest stack
+  ; starting at the top, go through each stack at that row
+  ; if the stack is tall enough, get the value from the stack
+  ; print out [<value>]
+  ; if the stack is not tall enough, print whitespace
+  (let ((tallest 0)
+        (out-line ""))
+    (dolist (stack container-stacks)
+      (when (> (length stack) tallest)
+        (setf tallest (length stack))))
+    ;(format t "tallest: ~a~%" tallest)
+    (format t "~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%")
+    (dotimes (row tallest)
+      ;(format t "row: ~a~%" (- tallest row))
+      (dolist (stack container-stacks)
+        ;(format t "stack height ~d~%" (length stack))
+        ;(format t "stack  ~a~%"  stack)
+        ;(format t "next-box: ~a~%" (nth row stack))
+        (if (<= (- tallest row) (length stack))
+          ;(concatenate 'string out-line "[" "N" "] ")
+        ;(if (<= 1 (length stack))
+          (setf out-line (concatenate 'string out-line "[" (nth (- (- tallest row) 1) (reverse stack)) "] "))
+          ;(concatenate 'string out-line "[" (nth row stack) "] ")
+          (setf out-line (concatenate 'string out-line "    "))
+          )
+        ;(format t "out-line ~a~%" out-line)
+        )
+      (format t "~a~%" out-line)
+      (setf out-line ""))
+    (sleep 0.1)))
+  ;(format t "~a~%" container-stacks)))
+
+;(format t "output: ~a~%" (init-containers *file* 'move-container-9001))
+
 (defun move-container (move-cmd container-stacks)
   (setf move-cmd (cons (decf (car move-cmd)) (cdr move-cmd)))
   (let ((from-column (nth (- (cadr move-cmd) 1) container-stacks))
@@ -54,7 +89,7 @@
         upper-column
         lower-bound
         upper-bound
-        new-stacks '())
+        new-stacks)
     (setf to-column (cons (car from-column) to-column))
     (setf from-column (cdr from-column))
     (if (< (cadr move-cmd) (caddr move-cmd))
@@ -72,9 +107,11 @@
               (setf new-stacks (append new-stacks (list lower-column)))
               (setf new-stacks (append new-stacks (list upper-column))))
           (setf new-stacks (append new-stacks (list (nth x container-stacks))))))
+    (print-stacks new-stacks)
     (if (>= 0 (car move-cmd))
       (return-from move-container new-stacks)
       (move-container move-cmd new-stacks))))
+
 
 (defun init-containers (file-data move-fn)
   (let (container-list
@@ -99,6 +136,8 @@
     (dotimes (x total-length)
       (setf container-stacks (cons (stack-containers container-list x) container-stacks)))
       (setf container-stacks (reverse container-stacks))
+    ;(print-stacks container-stacks)
+    ;(return-from init-containers)
     (dolist (next-move (reverse move-list))
       (setf container-stacks (funcall move-fn next-move container-stacks)))
     container-stacks
@@ -118,7 +157,7 @@
         upper-column
         lower-bound
         upper-bound
-        new-stacks '())
+        new-stacks)
     (setf to-column (append (subseq from-column 0 (car move-cmd)) to-column))
     (setf from-column (subseq from-column (car move-cmd)))
     (if (< (cadr move-cmd) (caddr move-cmd))
@@ -136,6 +175,8 @@
               (setf new-stacks (append new-stacks (list lower-column)))
               (setf new-stacks (append new-stacks (list upper-column))))
           (setf new-stacks (append new-stacks (list (nth x container-stacks))))))
-      new-stacks))
+    (print-stacks new-stacks)
+    new-stacks))
 
+(format t "output: ~a~%" (count-output  (init-containers *file* 'move-container)))
 (format t "output: ~a~%" (count-output  (init-containers *file* 'move-container-9001)))
