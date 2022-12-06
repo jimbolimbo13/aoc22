@@ -103,7 +103,7 @@
       (return-from move-container new-stacks)
       (move-container move-cmd new-stacks))))
 
-(defun init-containers (file-data)
+(defun init-containers (file-data move-fn)
   (let (container-list
         move-list
         (there-yet nil)
@@ -128,7 +128,7 @@
       (setf container-stacks (reverse container-stacks))
     ;(format t "move-list: ~a~%" (reverse move-list))
     (dolist (next-move (reverse move-list))
-      (setf container-stacks (move-container next-move container-stacks)))
+      (setf container-stacks (funcall move-fn next-move container-stacks)))
       ;(format t "container-stack: ~a~%" container-stacks)
     ;(move-container (car move-list) container-stacks)
     container-stacks
@@ -140,7 +140,57 @@
       (setf final-string (concatenate 'string final-string (car top))))
     final-string))
 
-(format t "output: ~a~%" (count-output  (init-containers *file*)))
+
+(defun move-container-9001 (move-cmd container-stacks)
+  (format t "Processing move cmd: ~a~%" move-cmd)
+  ;(setf move-cmd (cons (decf (car move-cmd)) (cdr move-cmd)))
+  (let ((from-column (nth (- (cadr move-cmd) 1) container-stacks))
+        (to-column (nth (- (caddr move-cmd) 1) container-stacks))
+        lower-column
+        upper-column
+        lower-bound
+        upper-bound
+        new-stacks '())
+    (setf to-column (append (subseq from-column 0 (car move-cmd)) to-column))
+    ;(setf to-column (cons (car from-column) to-column))
+    (setf from-column (subseq from-column (car move-cmd)))
+    ;(setf from-column (cdr from-column))
+    (format t "from-column: ~a~%" from-column)
+    (format t "to-column: ~a~%" to-column)
+    (if (< (cadr move-cmd) (caddr move-cmd))
+        (progn (setf lower-bound (- (cadr move-cmd) 1))
+               (setf upper-bound (- (caddr move-cmd) 1))
+               (setf lower-column from-column)
+               (setf upper-column to-column))
+        (progn (setf lower-bound (- (caddr move-cmd) 1))
+               (setf upper-bound (- (cadr move-cmd) 1))
+               (setf lower-column to-column)
+               (setf upper-column from-column)))
+        (format t "uppper: ~a~%" upper-bound)
+        (format t "uppper: ~a~%" upper-column)
+        (format t "lower: ~a~%" lower-bound)
+        (format t "lower: ~a~%" lower-column)
+    ;; (print (subseq container-stacks 0 lower-bound))
+    ;;                          (print (list lower-column))
+    ;;                          (print (subseq container-stacks (+ 1 lower-bound) upper-bound))
+    ;;                          (print (list upper-column))
+    ;; (setf new-stacks (append (subseq container-stacks 0 lower-bound)
+    ;;                          (list lower-column)
+    ;;                          (subseq container-stacks (+ 1 lower-bound) upper-bound)
+    ;;                          (list upper-column)))
+    (dotimes (x (length container-stacks))
+      (format t "looping at x: ~d~%" x)
+      (if (or (equal x lower-bound) (equal x upper-bound))
+          (if (equal x lower-bound)
+              (setf new-stacks (append new-stacks (list lower-column)))
+              (setf new-stacks (append new-stacks (list upper-column))))
+          (setf new-stacks (append new-stacks (list (nth x container-stacks)))))
+      (format t "new-stack: ~a~%" new-stacks))
+    ;(if (>= 0 (car move-cmd))
+      new-stacks))
+      ;(move-container-9001 move-cmd new-stacks))))
+
+(format t "output: ~a~%" (count-output  (init-containers *file* 'move-container-9001)))
 
 ; move 3 from 1 to 3
 ; decrement move
