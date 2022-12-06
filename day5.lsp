@@ -11,17 +11,9 @@
 
 (setf *file* (load-file "day5_input.txt")) ;; procedure
 ;(setf *file* (load-file "./test_input_day5.txt")) ;; procedure
-;;
-;;
-;;columns:
-;; 1 , 5 , 9
-;; every 4
-;; x - 1 / 4
 
 (defun find-total-length (length-line)
      (parse-integer (car (last (cl-ppcre:split :whitespace-char-class length-line)))))
-
-;(parse-integer (find-total-length (nth 3 *file*)))
 
 (defun parse-container-line (container-line prev-pos)
   (let ((containers '())
@@ -40,8 +32,6 @@
                                            (+ bracket-pos prev-pos)))))
     containers))
 
-;(parse-container-line (caddr *file*) 0)
-
 (defun stack-containers (c-list x)
   (let (c-stack)
     (dolist (next-row c-list)
@@ -57,7 +47,6 @@
     (mapcar 'parse-integer (list (nth 1 out-line) (nth 3 out-line) (nth 5 out-line)))))
 
 (defun move-container (move-cmd container-stacks)
-  ;(format t "Processing move cmd: ~a~%" move-cmd)
   (setf move-cmd (cons (decf (car move-cmd)) (cdr move-cmd)))
   (let ((from-column (nth (- (cadr move-cmd) 1) container-stacks))
         (to-column (nth (- (caddr move-cmd) 1) container-stacks))
@@ -66,8 +55,6 @@
         lower-bound
         upper-bound
         new-stacks '())
-    ;(format t "from-column: ~a~%" from-column)
-    ;(format t "to-column: ~a~%" to-column)
     (setf to-column (cons (car from-column) to-column))
     (setf from-column (cdr from-column))
     (if (< (cadr move-cmd) (caddr move-cmd))
@@ -79,26 +66,12 @@
                (setf upper-bound (- (cadr move-cmd) 1))
                (setf lower-column to-column)
                (setf upper-column from-column)))
-        ;(format t "uppper: ~a~%" upper-bound)
-        ;(format t "uppper: ~a~%" upper-column)
-        ;(format t "lower: ~a~%" lower-bound)
-        ;(format t "lower: ~a~%" lower-column)
-    ;; (print (subseq container-stacks 0 lower-bound))
-    ;;                          (print (list lower-column))
-    ;;                          (print (subseq container-stacks (+ 1 lower-bound) upper-bound))
-    ;;                          (print (list upper-column))
-    ;; (setf new-stacks (append (subseq container-stacks 0 lower-bound)
-    ;;                          (list lower-column)
-    ;;                          (subseq container-stacks (+ 1 lower-bound) upper-bound)
-    ;;                          (list upper-column)))
     (dotimes (x (length container-stacks))
-      ;(format t "looping at x: ~d~%" x)
       (if (or (equal x lower-bound) (equal x upper-bound))
           (if (equal x lower-bound)
               (setf new-stacks (append new-stacks (list lower-column)))
               (setf new-stacks (append new-stacks (list upper-column))))
           (setf new-stacks (append new-stacks (list (nth x container-stacks))))))
-      ;(format t "new-stack: ~a~%" new-stacks)
     (if (>= 0 (car move-cmd))
       (return-from move-container new-stacks)
       (move-container move-cmd new-stacks))))
@@ -126,11 +99,8 @@
     (dotimes (x total-length)
       (setf container-stacks (cons (stack-containers container-list x) container-stacks)))
       (setf container-stacks (reverse container-stacks))
-    ;(format t "move-list: ~a~%" (reverse move-list))
     (dolist (next-move (reverse move-list))
       (setf container-stacks (funcall move-fn next-move container-stacks)))
-      ;(format t "container-stack: ~a~%" container-stacks)
-    ;(move-container (car move-list) container-stacks)
     container-stacks
   ))
 
@@ -142,8 +112,6 @@
 
 
 (defun move-container-9001 (move-cmd container-stacks)
-  (format t "Processing move cmd: ~a~%" move-cmd)
-  ;(setf move-cmd (cons (decf (car move-cmd)) (cdr move-cmd)))
   (let ((from-column (nth (- (cadr move-cmd) 1) container-stacks))
         (to-column (nth (- (caddr move-cmd) 1) container-stacks))
         lower-column
@@ -152,11 +120,7 @@
         upper-bound
         new-stacks '())
     (setf to-column (append (subseq from-column 0 (car move-cmd)) to-column))
-    ;(setf to-column (cons (car from-column) to-column))
     (setf from-column (subseq from-column (car move-cmd)))
-    ;(setf from-column (cdr from-column))
-    (format t "from-column: ~a~%" from-column)
-    (format t "to-column: ~a~%" to-column)
     (if (< (cadr move-cmd) (caddr move-cmd))
         (progn (setf lower-bound (- (cadr move-cmd) 1))
                (setf upper-bound (- (caddr move-cmd) 1))
@@ -166,41 +130,12 @@
                (setf upper-bound (- (cadr move-cmd) 1))
                (setf lower-column to-column)
                (setf upper-column from-column)))
-        (format t "uppper: ~a~%" upper-bound)
-        (format t "uppper: ~a~%" upper-column)
-        (format t "lower: ~a~%" lower-bound)
-        (format t "lower: ~a~%" lower-column)
-    ;; (print (subseq container-stacks 0 lower-bound))
-    ;;                          (print (list lower-column))
-    ;;                          (print (subseq container-stacks (+ 1 lower-bound) upper-bound))
-    ;;                          (print (list upper-column))
-    ;; (setf new-stacks (append (subseq container-stacks 0 lower-bound)
-    ;;                          (list lower-column)
-    ;;                          (subseq container-stacks (+ 1 lower-bound) upper-bound)
-    ;;                          (list upper-column)))
     (dotimes (x (length container-stacks))
-      (format t "looping at x: ~d~%" x)
       (if (or (equal x lower-bound) (equal x upper-bound))
           (if (equal x lower-bound)
               (setf new-stacks (append new-stacks (list lower-column)))
               (setf new-stacks (append new-stacks (list upper-column))))
-          (setf new-stacks (append new-stacks (list (nth x container-stacks)))))
-      (format t "new-stack: ~a~%" new-stacks))
-    ;(if (>= 0 (car move-cmd))
+          (setf new-stacks (append new-stacks (list (nth x container-stacks))))))
       new-stacks))
-      ;(move-container-9001 move-cmd new-stacks))))
 
 (format t "output: ~a~%" (count-output  (init-containers *file* 'move-container-9001)))
-
-; move 3 from 1 to 3
-; decrement move
-;   move the from to (0 to 2)
-;
-; call move 2 from 1 t- 3
-; decrement move
-;   move the from to
-; call move 1 from 1 to 3
-; decrement move
-;   move the from to
-;   if move is 0, return the two affected columns
-;     rebuild the column list?
