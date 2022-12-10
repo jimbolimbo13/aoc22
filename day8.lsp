@@ -17,6 +17,12 @@
 ;(setf *file* (load-file "test_input_day8.txt")) ;; procedure
 
 (defun get-x-y (x y string-list)
+  (when (or
+         (or (> 0 x)
+             (> 0 y))
+         (or (<= (length (first string-list)) x)
+             (<= (length string-list) y)))
+      (return-from get-x-y -1))
   (- (char-int (elt (elt string-list y) x)) 48))
 
 (defun find-hidden (file-list)
@@ -46,8 +52,6 @@
            (from-left-x 0 (1+ from-left-x))a
            (from-right-x (1- maxX) (1- from-right-x)))
           ((<= maxY from-top-y))
-        (format t "coord: ~d,~d~%" outer-loop from-top-y)
-        (format t "~d~%~d~%~d~%" from-bottom-y from-left-x from-right-x)
         (when (< from-top-max (get-x-y outer-loop from-top-y file-list))
           (setf (aref tracker from-top-y outer-loop) 1)
           (setf from-top-max (get-x-y outer-loop from-top-y file-list))) ; from-top, outer loop is x
@@ -77,3 +81,43 @@
 
 
 (format t "Day8 part1: ~d~%" (find-hidden *file*))
+
+(defconstant up '(0 -1))
+(defconstant down '(0 1))
+(defconstant  left '(-1 0))
+(defconstant  right '(1 0))
+
+(defun score-direction (pos pos-shift file-list)
+  (let ((height (get-x-y (first pos) (second pos) file-list)))
+  (do ((new-pos (mapcar #'+ pos-shift pos)
+                )
+       (new-height (get-x-y
+                    (+ (first pos-shift) (first pos))
+                    (+ (second pos-shift) (second pos)) file-list)
+                     (get-x-y (first new-pos) (second new-pos) file-list))
+       (score-count 0 (1+ score-count)))
+      ((> 0 new-height)
+       score-count)
+    (setf new-pos (mapcar #'+ pos-shift new-pos))
+    (when (<= height new-height)
+      (return (1+ score-count)))
+    )))
+
+(defun how-scenic (file-list)
+  (let ((running-count 1)
+        (max-score 0)
+        (cardinal (list up down left right)))
+    (dotimes (y-val (length file-list))
+      (dotimes (x-val (length (first file-list)))
+        (dolist (next cardinal)
+          (setf running-count (* running-count
+                                (score-direction
+                                 (list x-val y-val)
+                                 next file-list)))
+          )
+        (when (< max-score running-count)
+          (setf max-score running-count))
+        (setf running-count 1)))
+    max-score))
+
+(format t "Day8 part2: ~a~%" (how-scenic *file*))
