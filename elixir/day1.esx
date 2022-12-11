@@ -4,8 +4,15 @@ defmodule Day10 do
   def load_file(f_name) do
     file_lines = String.split(File.read!(f_name), "\n\n")
     max_cals = Enum.map(file_lines, &sum_strings/1)
-    |> Enum.max()
-    IO.puts(max_cals)
+    part1 = Enum.max(max_cals)
+
+    part2 = Enum.sort(max_cals)
+    |> Enum.reverse()
+    |> Enum.slice(0,3)
+    |> Enum.sum()
+
+    IO.puts("Day1 part1: #{part1}")
+    IO.puts("Day1 part2: #{part2}")
   end
 
   def sum_elves(this) do
