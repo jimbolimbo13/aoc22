@@ -1,41 +1,5 @@
 ;; Day12
 ;;
-;; second array for tracking
-;;  it will start out at nil
-;;  if it's been visited, it will be 0
-;;  if it's on the path, it will be 1
-;;
-;; array to hold list of visited nodes in reverse order
-;;  this allows easy cons'ing and popping
-;;
-;; calculate the cost->distance
-;;  (abs )
-;;
-;; on a given spot:
-;;  check the neighbors:
-;;      is it a valid move? what's the cost?
-;;          is it valid: not an edge
-;;                       distance up is not greater than one
-;;                       has not already been visited
-;;          what's the cost: distance from destination
-;;                       subtract one from cost if it goes up?
-;;                       add one to cost if it goes down?
-;;                          not allowed to go down into an a
-;;      choose to move to the lowest-cost, valid move
-;;      mark all valid moves as checked in the array
-;;      mark choice in the array
-;;      append choice coords to the visited list
-;;      set choice as the current spot
-;;      finish
-;;
-;;      if no valid moves: backtrack
-;;          mark current spot as visited
-;;          set previous spot as current spot
-;;          finish
-;;
-;; loop forever, until current spot is E
-;;
-;;
 
 
 (ql:quickload :cl-ppcre )
@@ -48,8 +12,8 @@
 
 (defvar *file* nil) ;;procedure
 
-;(setf *file* (load-file "day12_input.txt")) ;; procedure
-(setf *file* (load-file "./test_input_day12.txt")) ;; procedure
+(setf *file* (load-file "day12_input.txt")) ;; procedure
+;(setf *file* (load-file "./test_input_day12.txt")) ;; procedure
 
 (defconstant big-number 1000000)
 
@@ -99,8 +63,8 @@
     (setf cur start-pos)
     (format t "cur: ~A~%" cur)
     (loop
-        (when (< test-limit test-ix)
-          (return))
+        ;; (when (< test-limit test-ix)
+        ;;   (return))
       (let* ((up (mapcar #'+ '(-1 0) cur))
              (up-scr (get-score up cur end-pos map visited))
             (down (mapcar #'+ '(1 0) cur))
@@ -117,7 +81,9 @@
         ;; (format t "right: ~A~%right-scr: ~A~%" right right-scr)
         (cond
           ((equal big-number best-score)
-           (backtrack )) ; TODO implement backtrack
+           (format t "backtracking from: ~A~%" cur)
+           (setf choice (caar path-list))
+           (setf path-list (cdr path-list)))
           ((<= down-scr best-score)
            (setf choice down))
           ((<= right-scr best-score)
@@ -125,9 +91,9 @@
           ((<= up-scr best-score)
            (setf choice up))
           ((<= left-scr best-score)
-           (setf choice left))
-          )
-         (setf path-list (cons (list choice) path-list))
+           (setf choice left)))
+        (unless (equal big-number best-score)
+          (setf path-list (cons (list choice) path-list)))
         (setf (aref visited (first cur) (second cur)) 't)
         (setf cur choice)
         (when (equal choice end-pos)
@@ -142,7 +108,7 @@
     (format t "visited: ~A~%" visited)
     ))
 
-(find-path *file* 40)
+(format t "Day12 part1: ~A~%" (find-path *file* 40))
 
 (defun not-too-high (here there)
   (if (< 1 (- there here))
@@ -164,8 +130,3 @@
       big-number)
   ))
 
-;; (defvar test-results (parse-input *file*))
-;; (first test-results)
-;; (1+ (parse-integer #\z ))
-;; (string-to-octets "z")
-;; (string-to-octets "{")
