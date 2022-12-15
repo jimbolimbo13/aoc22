@@ -1,7 +1,5 @@
 ;; Day14
 ;;
-;;
-
 
 (ql:quickload :cl-ppcre )
 
@@ -45,21 +43,15 @@
          )))
     (list cave lowest-rock)))
 
-;(setf test-input (parse-input *file*))
-;(aref test-input 10 502)
-
 (defun sandfall-1 (cave-data)
   (let ((start '(500 0))
         (cur-pos '(500 0))
         (sand-count 0)
         (lowest-rock (second cave-data))
         (cave (first cave-data)))
-    ;(format t "lowest-rock: ~A~%" lowest-rock)
   (loop
-    ;(format t "cur-pos: ~A~%" cur-pos)
     (cond
       ((< lowest-rock (second cur-pos))
-       ;(format t "leaving the loop~%")
        (return))
       ((not (aref cave (1+ (second cur-pos)) (first cur-pos)))
        (setf cur-pos (list (first cur-pos) (1+ (second cur-pos)))))
@@ -74,3 +66,32 @@
     sand-count))
 
 (format t "Day14 Part1: ~A~%" (sandfall-1 (parse-input *file*)))
+
+
+
+(defun sandfall-2 (cave-data)
+  (let ((start '(500 0))
+        (cur-pos '(500 0))
+        (sand-count 0)
+        (floor (+ 2 (second cave-data)))
+        (cave (first cave-data)))
+    (dotimes (ix 1000) ; same size as the array I created
+      (setf (aref cave floor ix) 't))
+  (loop
+    (cond
+      ((aref cave 0 500)
+       (return))
+      ((not (aref cave (1+ (second cur-pos)) (first cur-pos)))
+       (setf cur-pos (list (first cur-pos) (1+ (second cur-pos)))))
+      ((not (aref cave (1+ (second cur-pos)) (1- (first cur-pos))))
+       (setf cur-pos (list (1- (first cur-pos)) (1+ (second cur-pos)))))
+      ((not (aref cave (1+ (second cur-pos)) (1+ (first cur-pos))))
+       (setf cur-pos (list (1+ (first cur-pos)) (1+ (second cur-pos)))))
+      ('t
+       (incf sand-count)
+       (setf (aref cave (second cur-pos) (first cur-pos)) 't)
+       (setf cur-pos start))))
+    sand-count))
+
+
+(format t "Day14 Part2: ~A~%" (sandfall-2 (parse-input *file*)))
